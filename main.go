@@ -7,17 +7,18 @@ import (
 	// "time"
 	"path/filepath"
 	"regexp"
+	"io/fs"
 )
 
 type (
 	Regexp = regexp.Regexp
-	DirEntry = filepath.DirEntry
+	DirEntry = fs.DirEntry
 )
 
 func list_all_files_recursive(base_dir string, match *Regexp, match_on_abs_path bool, fls *[]string) error {
 	err := filepath.WalkDir(base_dir, func(path string, info DirEntry, err error) error {
 		if err != nil {
-			log.Println("prevent panic by handling failure accessing a path %q: %v\n", path, err)
+			log.Printf("prevent panic by handling failure accessing a path %q: %v \n", path, err)
 			return err
 		}
 		if info.IsDir() {
@@ -39,18 +40,18 @@ func list_all_files_recursive(base_dir string, match *Regexp, match_on_abs_path 
 		return nil
 	})
 	if err != nil {
-		log.Println("Got an error while processing path %s", base_dir)
+		log.Printf("Got an error while processing path %s \n", base_dir)
 		log.Fatal(err)
 	}
 	return nil
 }
 
 func main() {
-	pattern := "*"
+	pattern := "(?s).*"
 	base_dir := "/media/sunny/Windows/Users/saror/github"
 	use_match_on_abs_path := false
 
-	all_files := []string
+	var all_files []string
 
 	if err := list_all_files_recursive(base_dir, regexp.MustCompile(pattern), use_match_on_abs_path, &all_files); err != nil {
 		log.Fatal(err)
@@ -63,7 +64,6 @@ func main() {
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
-	//
 	//    sdata := string(content)
 
 	// chck64 := show(hashString(64, sdata))
